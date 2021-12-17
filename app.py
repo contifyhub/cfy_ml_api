@@ -8,16 +8,17 @@ from mitie import named_entity_extractor
 from pathlib import Path
 
 from constants import CLASSIFIED_MODELS, NER_MODEL
-from pydantic import BaseModel
 from fastapi import Depends, FastAPI, HTTPException, status
 import os
 import secrets
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import config
+from serializers import ArticleText, NerText
+
 
 @lru_cache()
 def get_settings():
-    return config.Settings()
+    return config.MlApiSettings()
 
 
 app = FastAPI()
@@ -30,7 +31,7 @@ ner_model = dict()
 
 def get_auth_status(
         credentials: HTTPBasicCredentials = Depends(security),
-        settings: config.Settings = Depends(get_settings)):
+        settings: config.MlApiSettings = Depends(get_settings)):
 
     correct_username = secrets.compare_digest(
         credentials.username, settings.api_username
@@ -96,13 +97,6 @@ def predict_classes(model_map, text_list, multilabel=False):
     return final_predictions
 
 
-class NerText(BaseModel):
-    text: list
-
-
-class StoryText(BaseModel):
-    text: list
-
 @app.post('/predict/mitie/')
 async def predict_mitie(story: NerText,
                         auth_status: int = Depends(get_auth_status)):
@@ -124,11 +118,11 @@ async def predict_mitie(story: NerText,
 
 
 @app.post('/predict/topic/')
-async def predict_topics(story: StoryText,
+async def predict_topics(story: ArticleText,
                          auth_status: int = Depends(get_auth_status)):
     """This api is used to predict Topic from Text.
 
-    params: story: StoryText
+    params: story: ArticleText
     Return: predictions
     """
     data = story.dict()
@@ -141,10 +135,10 @@ async def predict_topics(story: StoryText,
 
 
 @app.post('/predict/industry/')
-async def predict_industry(story: StoryText,
+async def predict_industries(story: ArticleText,
                            auth_status: int = Depends(get_auth_status)):
     """This api is used to predict Industry entities from Text.
-    params: story: StoryText
+    params: story: ArticleText
     Return: predictions
     """
 
@@ -157,12 +151,13 @@ async def predict_industry(story: StoryText,
         'result': predictions
     }
 
-@app.post('/predict/customtags/{client_id}/')
-async def predict_ct(client_id: str, story: StoryText,
-                     auth_status: int = Depends(get_auth_status)):
-    """This api is used to attach Customtags to StoryText.
 
-    params: story: StoryText
+@app.post('/predict/customtags/{client_id}/')
+async def predict_custom_tags(client_id: str, story: ArticleText,
+                              auth_status: int = Depends(get_auth_status)):
+    """This api is used to attach Customtags to ArticleText.
+
+    params: story: ArticleText
             client_id: id of the client
     Return: predictions
     """
@@ -176,11 +171,11 @@ async def predict_ct(client_id: str, story: StoryText,
 
 
 @app.post('/predict/reject/')
-async def predict_ct(story: StoryText,
-                     auth_status: int = Depends(get_auth_status)):
-    """This api is used to  reject StoryText.
+async def predict_reject(story: ArticleText,
+                         auth_status: int = Depends(get_auth_status)):
+    """This api is used to  reject ArticleText.
 
-    params: story: StoryText
+    params: story: ArticleText
     Return: predictions
     """
 
@@ -194,5 +189,4 @@ async def predict_ct(story: StoryText,
 
 
 if __name__ == '__main__':
-    uvicorn.run(f"{Path(__file__).stem}:app", port=8080, host='localhost',
-                reload=True)
+    uvicorn.run(f"{Path(__file__).stem}:app", port=8080, host='localhost', reload=True)
