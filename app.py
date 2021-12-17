@@ -29,7 +29,7 @@ classified_model_map = defaultdict(lambda: defaultdict(list))
 ner_model = dict()
 
 
-def get_auth_status(
+def is_authenticated_user(
         credentials: HTTPBasicCredentials = Depends(security),
         settings: config.MlApiSettings = Depends(get_settings)):
 
@@ -45,7 +45,7 @@ def get_auth_status(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    return 200
+    return True
 
 
 for model_type in CLASSIFIED_MODELS:
@@ -99,7 +99,7 @@ def predict_classes(model_map, text_list, multilabel=False):
 
 @app.post('/predict/mitie/')
 async def predict_mitie(story: NerText,
-                        auth_status: int = Depends(get_auth_status)):
+                        auth_status: int = Depends(is_authenticated_user)):
 
     """This api is used to extract entities from Text using mitie.
     params: story: NerText
@@ -119,7 +119,7 @@ async def predict_mitie(story: NerText,
 
 @app.post('/predict/topic/')
 async def predict_topics(story: ArticleText,
-                         auth_status: int = Depends(get_auth_status)):
+                         auth_status: int = Depends(is_authenticated_user)):
     """This api is used to predict Topic from Text.
 
     params: story: ArticleText
@@ -136,7 +136,7 @@ async def predict_topics(story: ArticleText,
 
 @app.post('/predict/industry/')
 async def predict_industries(story: ArticleText,
-                           auth_status: int = Depends(get_auth_status)):
+                           auth_status: int = Depends(is_authenticated_user)):
     """This api is used to predict Industry entities from Text.
     params: story: ArticleText
     Return: predictions
@@ -154,7 +154,7 @@ async def predict_industries(story: ArticleText,
 
 @app.post('/predict/customtags/{client_id}/')
 async def predict_custom_tags(client_id: str, story: ArticleText,
-                              auth_status: int = Depends(get_auth_status)):
+                              auth_status: int = Depends(is_authenticated_user)):
     """This api is used to attach Customtags to ArticleText.
 
     params: story: ArticleText
@@ -172,7 +172,7 @@ async def predict_custom_tags(client_id: str, story: ArticleText,
 
 @app.post('/predict/reject/')
 async def predict_reject(story: ArticleText,
-                         auth_status: int = Depends(get_auth_status)):
+                         auth_status: int = Depends(is_authenticated_user)):
     """This api is used to  reject ArticleText.
 
     params: story: ArticleText
