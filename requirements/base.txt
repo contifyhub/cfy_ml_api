@@ -1,5 +1,6 @@
 fastapi==0.70.0
 gunicorn==20.1.0
+Cython==0.29.26
 ipython==7.30.0
 joblib==0.11
 mitie==0.7.0
@@ -7,4 +8,3 @@ pydantic==1.8.2
 python-dotenv==0.19.2
 scikit-learn==0.22.1
 uvicorn==0.15.0
-Cython==0.29.26
