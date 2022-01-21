@@ -5,8 +5,8 @@ ROOT_DIR = os.path.join("..")
 
 
 class MlApiSettings(BaseSettings):
-    api_username: str = ''
-    api_password: str = ''
+    ML_API_USERNAME: str = ''
+    ML_API_PASSWORD: str = ''
 
     class Config:
         env_file = ".env"

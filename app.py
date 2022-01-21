@@ -34,10 +34,10 @@ def is_authenticated_user(
         settings: config.MlApiSettings = Depends(get_settings)):
 
     correct_username = secrets.compare_digest(
-        credentials.username, settings.api_username
+        credentials.username, settings.ML_API_USERNAME
     )
     correct_password = secrets.compare_digest(
-        credentials.password, settings.api_password
+        credentials.password, settings.ML_API_PASSWORD
     )
     if not (correct_username and correct_password):
         raise HTTPException(
@@ -103,7 +103,7 @@ async def predict_mitie(story: NerText,
 
     """This api is used to extract entities from Text using mitie.
     params: story: NerText
-    Return: predictions
+    Return: ner predictions
     """
     data = story.dict()
     text_token = data['text']
@@ -123,7 +123,7 @@ async def predict_topics(story: ArticleText,
     """This api is used to predict Topic from Text.
 
     params: story: ArticleText
-    Return: predictions
+    Return: Topic ids
     """
     data = story.dict()
     text_list = data['text']
@@ -139,7 +139,7 @@ async def predict_industries(story: ArticleText,
                            auth_status: int = Depends(is_authenticated_user)):
     """This api is used to predict Industry entities from Text.
     params: story: ArticleText
-    Return: predictions
+    Return: industry ids
     """
 
     data = story.dict()
@@ -159,7 +159,7 @@ async def predict_custom_tags(client_id: str, story: ArticleText,
 
     params: story: ArticleText
             client_id: id of the client
-    Return: predictions
+    Return: custom tag ids
     """
     data = story.dict()
     text_list = data['text']
@@ -176,7 +176,7 @@ async def predict_reject(story: ArticleText,
     """This api is used to  reject ArticleText.
 
     params: story: ArticleText
-    Return: predictions
+    Return:  politics, sports, business entertainment
     """
 
     data = story.dict()
