@@ -34,10 +34,10 @@ def is_authenticated_user(
         settings: config.MlApiSettings = Depends(get_settings)):
 
     correct_username = secrets.compare_digest(
-        credentials.username, settings.api_username
+        credentials.username, settings.ML_API_USERNAME
     )
     correct_password = secrets.compare_digest(
-        credentials.password, settings.api_password
+        credentials.password, settings.ML_API_PASSWORD
     )
     if not (correct_username and correct_password):
         raise HTTPException(
